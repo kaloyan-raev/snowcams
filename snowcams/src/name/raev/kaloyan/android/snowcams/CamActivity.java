@@ -7,10 +7,13 @@ import java.net.URL;
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 public class CamActivity extends Activity {
-	
+
+	private ProgressBar mProgressBar;
 	private ImageView mImageView;
 	
     /** Called when the activity is first created. */
@@ -18,8 +21,13 @@ public class CamActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        
+
+        mProgressBar = (ProgressBar) findViewById(R.id.progress);
         mImageView = (ImageView) findViewById(R.id.camImage);
+        
+        // show the progress bar before starting loading the image
+        mProgressBar.setVisibility(View.VISIBLE);
+        mImageView.setVisibility(View.INVISIBLE);
         
         new Thread(new Runnable() {
 			@Override
@@ -28,7 +36,11 @@ public class CamActivity extends Activity {
 				mImageView.post(new Runnable() {
 					@Override
 					public void run() {
+						// set the loaded image
 						mImageView.setImageDrawable(drawable);
+						// hide the progress bar
+						mImageView.setVisibility(View.VISIBLE);
+						mProgressBar.setVisibility(View.INVISIBLE);
 					}
 				});
 			}
