@@ -7,7 +7,10 @@ import java.net.URL;
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
@@ -36,8 +39,15 @@ public class CamActivity extends Activity {
 				mImageView.post(new Runnable() {
 					@Override
 					public void run() {
-						// set the loaded image
-						mImageView.setImageDrawable(drawable);
+						if (drawable == null) {
+							// no image was loaded
+							mImageView.setImageResource(R.drawable.no_camera);
+							mImageView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+						} else {
+							// set the loaded image
+							mImageView.setImageDrawable(drawable);
+							mImageView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.CENTER));
+						}
 						// hide the progress bar
 						mImageView.setVisibility(View.VISIBLE);
 						mProgressBar.setVisibility(View.INVISIBLE);
