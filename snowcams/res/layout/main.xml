@@ -3,19 +3,9 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
     
-    <ImageView
-        android:id="@+id/camImage"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:visibility="visible" />
-
-    <ProgressBar
-        android:id="@+id/progress"
-        style="@android:style/Widget.ProgressBar.Large"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="invisible" />
+    <uk.co.jasonfry.android.tools.ui.SwipeView  
+	    android:id="@+id/swipe_view"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="fill_parent"	/>
 
 </FrameLayout>
