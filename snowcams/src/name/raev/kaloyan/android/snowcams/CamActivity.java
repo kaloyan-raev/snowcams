@@ -20,6 +20,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 public class CamActivity extends Activity implements OnClickListener {
 
@@ -104,9 +105,17 @@ public class CamActivity extends Activity implements OnClickListener {
 	}
 	
 	class DoubleTapDetector extends SimpleOnGestureListener {
+		
+		@Override
+		public boolean onSingleTapConfirmed(MotionEvent e) {
+			// show the camera name on single tap
+			Toast.makeText(getApplicationContext(), "Алеко", Toast.LENGTH_SHORT).show();
+			return true;
+		}
 
 		@Override
 		public boolean onDoubleTap(MotionEvent e) {
+			// reload the camera image on double tap
 			loadCamera();
 			return true;
 		}
@@ -115,8 +124,7 @@ public class CamActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		// TODO Auto-generated method stub
-		
+		// do nothing here - the gesture listener will process the event
 	}
 
 }
