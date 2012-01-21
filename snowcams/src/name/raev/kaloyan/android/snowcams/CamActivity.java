@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 import uk.co.jasonfry.android.tools.ui.SwipeView;
+import uk.co.jasonfry.android.tools.ui.SwipeView.OnPageChangedListener;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -27,12 +28,20 @@ public class CamActivity extends Activity implements OnClickListener {
 
 	private static final String[] mUrls = {
 		"http://cam.dir.bg/sf/c2/image.jpg", 
-		"http://media.borovets-bg.com/cams/channel?channel=41"
+		"http://media.borovets-bg.com/cams/channel?channel=41", 
+		"http://84.54.155.86:8040/oneshotimage.jpg", 
+		"http://212.91.164.28:8080/cam_1.jpg", 
+		"http://www.hotelsima.com/meteo/cam0.jpg", 
+		"http://pss.bg/stations/kancho/kom/video.jpg"
 	};
 	
 	private static final String[] mLabels = {
 		"х. Алеко", 
-		"Боровец"
+		"Боровец", 
+		"Чепеларе",
+		"Копривки", 
+		"Беклемето", 
+		"х. Ком"
 	};
 	
 	private SwipeView mSwipeView;
@@ -57,21 +66,35 @@ public class CamActivity extends Activity implements OnClickListener {
         mSwipeView.setOnTouchListener(gestureListener);
         
         // initialize the swipe view with empty children
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < mUrls.length; i++) {
         	mSwipeView.addView(new FrameLayout(this));
         }
         
-        // load the images of the first two cameras
-        createCameraView(0);
-        createCameraView(1);
-        
-        // check if page index is cached
+        // find the initial page index
+        int initialPage = 0;
+        // check if there is a cached state
         Object cachedObject = getLastNonConfigurationInstance();
         if (cachedObject != null) {
         	// cache found - scroll to the cached page index
         	SwipeViewCache cache = (SwipeViewCache) cachedObject;
-        	mSwipeView.scrollToPage(cache.currentPage);
+        	initialPage = cache.currentPage;
         }
+        
+        // scroll to the initial page
+    	mSwipeView.scrollToPage(initialPage);
+    	
+    	// load the images of the initial page and one page before and after
+        createCameraView(initialPage);
+        if (initialPage != mSwipeView.getPageCount() - 1) {
+        	createCameraView(initialPage + 1);
+        }
+        if (initialPage != 0) {
+        	createCameraView(initialPage - 1);
+        }
+        
+        // add listener for dynamically load images on every swipe event
+        SwipeImageLoader mSwipeImageLoader = new SwipeImageLoader();
+        mSwipeView.setOnPageChangedListener(mSwipeImageLoader);
     }
     
 	/*
@@ -82,7 +105,7 @@ public class CamActivity extends Activity implements OnClickListener {
     	SwipeViewCache cache = new SwipeViewCache();
     	cache.currentPage = mSwipeView.getCurrentPage();
     	
-		int count = mSwipeView.getChildContainer().getChildCount();
+		int count = mSwipeView.getPageCount();
 		cache.bitmaps = new Bitmap[count];
 		for (int i = 0; i < count; i++) {
 			// retrieve the next child of the swipe view
@@ -179,12 +202,43 @@ public class CamActivity extends Activity implements OnClickListener {
 		}
 	}
 	
-	class SwipeViewCache {
+	private class SwipeViewCache {
 		int currentPage;
 		Bitmap[] bitmaps;
 	}
 	
-	class DoubleTapDetector extends SimpleOnGestureListener {
+	private class SwipeImageLoader implements OnPageChangedListener {
+
+		@Override
+		public void onPageChanged(int oldPage, int newPage) {
+			if (newPage > oldPage) { 
+				// going forwards
+				if (newPage != (mSwipeView.getPageCount() - 1)) {
+					// load the view after the new page
+					createCameraView(newPage + 1);
+				}
+				
+				if (oldPage != 0) {
+					// destroy the view before the old page
+					getFrameLayout(oldPage - 1).removeAllViews();
+				}
+			} else { 
+				// going backwards
+				if(newPage != 0) {
+					// load the view before the new page
+					createCameraView(newPage - 1);
+				}
+				
+				if (oldPage != (mSwipeView.getPageCount() - 1)) {
+					// destroy the view after the old page
+					getFrameLayout(oldPage + 1).removeAllViews();
+				}
+			}
+		}
+    	
+    }
+	
+	private class DoubleTapDetector extends SimpleOnGestureListener {
 		
 		/*
 		 * Show camera name. 
