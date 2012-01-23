@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2012 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
 package name.raev.kaloyan.android.snowcams;
 
 import java.io.IOException;
@@ -10,6 +20,7 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
@@ -186,7 +197,10 @@ public class CamActivity extends Activity implements OnClickListener {
 			ImageView imageView = (ImageView) layout.getChildAt(0);
 			if (imageView != null) {
 				// extract the bitmap from the image view
-				cache.bitmaps[i] = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+				BitmapDrawable drawable = ((BitmapDrawable) imageView.getDrawable());
+				if (drawable != null) {
+					cache.bitmaps[i] = drawable.getBitmap();
+				}
 			}
 		}
 		
@@ -215,7 +229,7 @@ public class CamActivity extends Activity implements OnClickListener {
         	imageView.setImageBitmap(cachedBitmap);
         } else {
         	// load the image from network in a separate thread
-	        loadCamera(index);
+	        new DownloadImageTask(index).execute();
         }
 	}
 	
@@ -226,52 +240,6 @@ public class CamActivity extends Activity implements OnClickListener {
         	return cache.bitmaps[index];
         }
         return null;
-	}
-	
-	private void loadCamera(final int index) {
-		FrameLayout layout = getFrameLayout(index);
-		final ImageView imageView = getImageView(layout);
-		final ProgressBar progressBar = getProgressBar(layout);
-		
-		// show the progress bar before starting loading the image
-        progressBar.setVisibility(View.VISIBLE);
-        
-        // load the image in a separate thread
-        new Thread(new Runnable() {
-			@Override
-			public void run() {
-				final Bitmap bitmap = loadImageFromNetwork(index);
-				imageView.post(new Runnable() {
-					@Override
-					public void run() {
-						if (bitmap == null) {
-							// no image was loaded
-							imageView.setImageResource(R.drawable.no_camera);
-							imageView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
-						} else {
-							// set the loaded image
-							imageView.setImageBitmap(bitmap);
-							imageView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.CENTER));
-						}
-						// hide the progress bar
-						progressBar.setVisibility(View.INVISIBLE);
-					}
-				});
-			}
-        }).start();
-	}
-
-	private Bitmap loadImageFromNetwork(int index) {
-		try {
-			URL url = new URL(mUrls[index]);
-			InputStream is = (InputStream) url.getContent();
-			Bitmap bitmap = BitmapFactory.decodeStream(is);
-			return bitmap;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
 	}
 	
 	private class SwipeViewCache {
@@ -328,7 +296,7 @@ public class CamActivity extends Activity implements OnClickListener {
 		@Override
 		public boolean onDoubleTap(MotionEvent e) {
 			// reload the camera image on double tap
-			loadCamera(mSwipeView.getCurrentPage());
+			new DownloadImageTask(mSwipeView.getCurrentPage()).execute();
 			return true;
 		}
 		
@@ -349,6 +317,57 @@ public class CamActivity extends Activity implements OnClickListener {
 	
 	private ProgressBar getProgressBar(FrameLayout layout) {
 		return (ProgressBar) layout.getChildAt(1);
+	}
+	
+	class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
+		
+		private int index;
+		private ImageView imageView;
+		private ProgressBar progressBar;
+		
+		public DownloadImageTask(int index) {
+			this.index = index;
+
+			FrameLayout layout = getFrameLayout(index);
+			imageView = getImageView(layout);
+			progressBar = getProgressBar(layout);
+		}
+
+		@Override
+		protected void onPreExecute() {
+			// show the progress bar before starting loading the image
+	        progressBar.setVisibility(View.VISIBLE);
+		}
+
+		@Override
+		protected Bitmap doInBackground(Void... params) {
+			try {
+				URL url = new URL(mUrls[index]);
+				InputStream is = (InputStream) url.getContent();
+				Bitmap bitmap = BitmapFactory.decodeStream(is);
+				return bitmap;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+			}
+		}
+
+		@Override
+		protected void onPostExecute(Bitmap result) {
+			if (result == null) {
+				// no image was loaded
+				imageView.setImageResource(R.drawable.no_camera);
+				imageView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+			} else {
+				// set the loaded image
+				imageView.setImageBitmap(result);
+				imageView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.CENTER));
+			}
+			// hide the progress bar
+			progressBar.setVisibility(View.INVISIBLE);
+		}
+
 	}
 
 }
