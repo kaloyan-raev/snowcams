@@ -21,6 +21,7 @@ User Guide
 * **Swipe left** or right for browsing through the list of cameras. 
 * **Tap** for seeing the camera name. 
 * **Double tap** for reloading the camera image.
+* **Rotate** the device to change between portrait and landscape orientation. 
 
 Features
 --------
