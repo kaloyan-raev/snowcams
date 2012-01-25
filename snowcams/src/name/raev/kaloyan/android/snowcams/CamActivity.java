@@ -28,6 +28,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.Gravity;
@@ -43,96 +44,6 @@ import android.widget.Toast;
 
 public class CamActivity extends Activity implements OnClickListener {
 
-	private static final String[] mUrls = {
-		"http://cam.dir.bg/sf/c2/image.jpg", 
-		"http://pss.bg/vremeto/cache_webcam.php?id=35", 
-		"http://pss.bg/vremeto/cache_webcam.php?id=34", 
-		"http://pss.bg/stations/kancho/cherni/webcam.jpg",
-		"http://pss.bg/stations/kancho/vetrovala/webcam.jpg", 
-		"http://pss.bg/stations/kancho/ofelia/webcam.jpg", 
-		"http://pss.bg/stations/kancho/ofelia/webcam1.jpg", 
-		"http://media.borovets-bg.com/cams/channel?channel=41", 
-		"http://media.borovets-bg.com/cams/channel?channel=61", 
-		"http://media.borovets-bg.com/cams/channel?channel=11", 
-		"http://media.borovets-bg.com/cams/channel?channel=21", 
-		"http://media.borovets-bg.com/cams/channel?channel=51", 
-		"http://media.borovets-bg.com/cams/channel?channel=81", 
-		"http://media.borovets-bg.com/cams/channel?channel=71", 
-		"http://beo-db.inrne.bas.bg:8888/cgi-bin/viewer/video.jpg", 
-		"http://62.73.67.230:2001/image.jpg", 
-		"http://62.73.67.235/IMAGE.JPG", 
-		"http://www.rilskiezera.bg/meteo/rilskiezerahut.jpg", 
-		"http://www.rilskiezera.bg/cam_ds/cam_ds.jpg", 
-		"http://www.banskoski.com/images/livecam/livecam4-bg.jpg", 
-		"http://www.banskoski.com/images/livecam/livecam3-bg.jpg", 
-		"http://www.banskoski.com/images/livecam/livecam1-bg.jpg", 
-		"http://www.banskoski.com/images/livecam/livecam2-bg.jpg", 
-		"http://www.banskoski.com/images/livecam/livecam6-bg.jpg", 
-		"http://www.banskoski.com/images/livecam/livecam5-bg.jpg", 
-		"http://www.stringmeteo.com/stations/gotsehut/webcamimage.jpg", 
-		"http://www.stringmeteo.com/stations/bezbog/webcamimage.jpg",  
-		"http://84.54.155.86:8040/oneshotimage.jpg", 
-		"http://84.54.155.86:8030/oneshotimage.jpg",
-//		"http://sob.nao-rozhen.org/sites/default/files/cameras/outdoor.jpg", 
-//		"http://www.rodopite.bg:8080/oneshotimage.jpg", 
-		"http://www.vremeto.org/zdravetz/zdravetz-hut.jpg", 
-		"http://www.hotelzdravetz.com/wdisplay/webcam000M.jpg", 
-		"http://webcam.kovachevitsa-tavern.com/images/video.jpg", 
-		"http://212.91.164.28:8080/cam_1.jpg", 
-		"http://www.stamb.net/dermenka/dermenka.jpg", 
-		"http://hpleven-camera.pladi.bg:2004/IMAGE.JPG", 
-		"http://www.hotelsima.com/meteo/cam0.jpg", 
-		"http://www.dobrila.eu/meteo/dobrila.jpg", 
-		"http://pss.bg/stations/kancho/kom/video.jpg", 
-		"http://193.68.123.246/cgi-bin/viewer/video.jpg", 
-//		"http://193.68.123.245/axis-cgi/mjpg/video.cgi?resolution=640x480"
-	};
-	
-	private static final String[] mLabels = {
-		"х. Алеко", 
-		"х. Алеко 2", 
-		"Витошко лале", 
-		"Черни връх", 
-		"Ветровала", 
-		"Офелия 1", 
-		"Офелия 2", 
-		"Боровец", 
-		"Ситняково", 
-		"писти Ястребец", 
-		"финал Ястребец 3", 
-		"писта Попангелов", 
-		"х. Ястребец", 
-		"Маркуджик 2", 
-		"вр. Мусала", 
-		"х. Мальовица", 
-		"ски зона Мальовица", 
-		"х. Рилски езера", 
-		"х. Пионерска", 
-		"Платото", 
-		"Шилигарника", 
-		"Бъндеришка поляна", 
-		"Тодорка", 
-		"Чалин валог", 
-		"Банско", 
-		"х. Гоце Делчев", 
-		"Безбог", 
-		"Чепеларе", 
-		"Мечи чал", 
-//		"Рожен", 
-//		"х. Перелик", 
-		"х. Здравец", 
-		"хотел Здравец", 
-		"Ковачевица", 
-		"Копривки", 
-		"х. Дерменка", 
-		"х. Плевен", 
-		"Беклемето", 
-		"х. Добрила", 
-		"х. Ком", 
-		"Узана 1", 
-//		"Узана 2"
-	};
-	
 	private SwipeView mSwipeView;
 	
     /** Called when the activity is first created. */
@@ -155,7 +66,7 @@ public class CamActivity extends Activity implements OnClickListener {
         mSwipeView.setOnTouchListener(gestureListener);
         
         // initialize the swipe view with empty children
-        for (int i = 0; i < mUrls.length; i++) {
+        for (int i = 0; i < Camera.count(); i++) {
         	mSwipeView.addView(new FrameLayout(this));
         }
         
@@ -291,7 +202,7 @@ public class CamActivity extends Activity implements OnClickListener {
 		 */
 		@Override
 		public boolean onSingleTapConfirmed(MotionEvent e) {
-			String label = mLabels[mSwipeView.getCurrentPage()];
+			String label = Camera.labelFor(mSwipeView.getCurrentPage());
 			Toast.makeText(getApplicationContext(), label, Toast.LENGTH_SHORT).show();
 			return true;
 		}
@@ -348,13 +259,12 @@ public class CamActivity extends Activity implements OnClickListener {
 		@Override
 		protected Bitmap doInBackground(Void... params) {
 			try {
-				URL url = new URL(mUrls[index]);
+				URL url = new URL(Camera.urlFor(index));
 				InputStream is = (InputStream) url.getContent();
 				Bitmap bitmap = BitmapFactory.decodeStream(is);
 				return bitmap;
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.w("CamActivity", "Cannot load image from camera '" + Camera.labelFor(index) + "'.", e);
 				return null;
 			}
 		}
