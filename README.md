@@ -33,12 +33,15 @@ Features
 * Camera names shown using a single tap gesture. 
 * Reload of the camera image using double tap gesture. 
 
-### Coming soon
+### Coming Soon
 
 * Index page giving quick overview of all cameras. 
 * Default camera - the application will open directly on the chosen default camera. 
 * Streaming mode for a camera switched on and off using a long click gesture. 
 * Switching on and off cameras from the list. 
+* Save screenshot on the phone. 
+* Share screenshot in social networks. 
+* Show location of cameras on Google Maps. 
 
 License
 -------
