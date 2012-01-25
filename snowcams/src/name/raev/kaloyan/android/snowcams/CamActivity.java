@@ -127,27 +127,30 @@ public class CamActivity extends Activity implements OnClickListener {
 	private void createCameraView(int index) {
 		FrameLayout layout = ((FrameLayout) mSwipeView.getChildContainer().getChildAt(index));
 		
-		// create the image view
-		ImageView imageView = new ImageView(this);
-		imageView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.CENTER));
-		imageView.setVisibility(View.VISIBLE);
-		layout.addView(imageView);
-		
-		// create the progress bar
-		ProgressBar progress = new ProgressBar(this, null, android.R.attr.progressBarStyleLarge);
-		progress.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
-		progress.setVisibility(View.INVISIBLE);
-		layout.addView(progress);
-		        
-        // check if there is a cached image
-        Bitmap cachedBitmap = getCachedBitmap(index);
-        if (cachedBitmap != null) {
-        	// cached image found - set it to the image view
-        	imageView.setImageBitmap(cachedBitmap);
-        } else {
-        	// load the image from network in a separate thread
-	        new DownloadImageTask(index).execute();
-        }
+		// check if the view on this page is already created
+		if (layout.getChildCount() == 0) {
+			// create the image view
+			ImageView imageView = new ImageView(this);
+			imageView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.CENTER));
+			imageView.setVisibility(View.VISIBLE);
+			layout.addView(imageView);
+			
+			// create the progress bar
+			ProgressBar progress = new ProgressBar(this, null, android.R.attr.progressBarStyleLarge);
+			progress.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+			progress.setVisibility(View.INVISIBLE);
+			layout.addView(progress);
+			        
+	        // check if there is a cached image
+	        Bitmap cachedBitmap = getCachedBitmap(index);
+	        if (cachedBitmap != null) {
+	        	// cached image found - set it to the image view
+	        	imageView.setImageBitmap(cachedBitmap);
+	        } else {
+	        	// load the image from network in a separate thread
+		        new DownloadImageTask(index).execute();
+	        }
+		}
 	}
 	
 	private Bitmap getCachedBitmap(int index) {
@@ -174,21 +177,11 @@ public class CamActivity extends Activity implements OnClickListener {
 					// load the view after the new page
 					createCameraView(newPage + 1);
 				}
-				
-				if (oldPage != 0) {
-					// destroy the view before the old page
-					getFrameLayout(oldPage - 1).removeAllViews();
-				}
 			} else { 
 				// going backwards
 				if(newPage != 0) {
 					// load the view before the new page
 					createCameraView(newPage - 1);
-				}
-				
-				if (oldPage != (mSwipeView.getPageCount() - 1)) {
-					// destroy the view after the old page
-					getFrameLayout(oldPage + 1).removeAllViews();
 				}
 			}
 		}
