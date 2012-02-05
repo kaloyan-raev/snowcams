@@ -16,14 +16,8 @@
  ***************************************************************************/
 package name.raev.kaloyan.android.snowcams;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -32,17 +26,17 @@ import android.widget.ImageView;
 
 public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
 	
-	private CameraActivity activity;
-	private int index;
+	private CameraActivity mActivity;
+	private int mIndex;
 	
 	public DownloadImageTask(CameraActivity activity, int index) {
-		this.activity = activity;
-		this.index = index;
+		this.mActivity = activity;
+		this.mIndex = index;
 	}
 
 	@Override
 	protected void onPreExecute() {
-		CameraPage page = activity.getCameraPage(index);
+		CameraPage page = mActivity.getCameraPage(mIndex);
 		if (page != null) {
 			// show the progress bar before starting loading the image
 	        page.getProgressBar().setVisibility(View.VISIBLE);
@@ -51,32 +45,24 @@ public class DownloadImageTask extends AsyncTask<Void, Void, Bitmap> {
 
 	@Override
 	protected Bitmap doInBackground(Void... params) {
-		try {
-			URL url = new URL(Camera.urlFor(index));
-			InputStream is = (InputStream) url.getContent();
-			Bitmap bitmap = BitmapFactory.decodeStream(is);
-			return bitmap;
-		} catch (IOException e) {
-			Log.w("CameraActivity", "Cannot load image from camera '" + Camera.labelFor(index) + "'.", e);
-			return null;
-		}
+		return ImageUtil.download(Camera.urlFor(mIndex));
 	}
 
 	@Override
 	protected void onPostExecute(Bitmap result) {
-		CameraPage page = activity.getCameraPage(index);
+		CameraPage page = mActivity.getCameraPage(mIndex);
 		if (page != null) {
-			ImageView imageView = page.getImageView();
+			ImageView image = page.getImageView();
 			if (result == null) {
 				// no image was loaded
-				imageView.setImageResource(R.drawable.no_camera);
-				imageView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+				image.setImageResource(R.drawable.no_camera);
+				image.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
 			} else {
 				// set the loaded image
-				imageView.setImageBitmap(result);
-				imageView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.CENTER));
+				image.setImageBitmap(result);
+				image.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.CENTER));
 				// cache the loaded image
-				CameraCache.cacheBitmap(index, result);
+				CameraCache.cacheBitmap(mIndex, result);
 			}
 			// hide the progress bar
 			page.getProgressBar().setVisibility(View.INVISIBLE);

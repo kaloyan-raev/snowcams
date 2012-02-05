@@ -48,7 +48,7 @@ public class CameraActivity extends Activity implements OnClickListener {
         };
 
         // create view
-        setContentView(R.layout.main);
+        setContentView(R.layout.camera);
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(new CameraPageAdapter());
         mPager.setPageMargin(8);
@@ -56,8 +56,8 @@ public class CameraActivity extends Activity implements OnClickListener {
         mPager.setOnClickListener(this);
         mPager.setOnTouchListener(gestureListener);
         
-        // find the initial page index
-        int initialPage = 0;
+        // find the initial page index - first check if passed with the intent
+        int initialPage = getIntent().getIntExtra("index", 0);
         // check if there is a cached state
         Object cachedObject = getLastNonConfigurationInstance();
         if (cachedObject != null) {

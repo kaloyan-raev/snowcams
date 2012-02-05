@@ -31,11 +31,11 @@ Features
 * Support change in the screen orientation of the device. 
 * Easy navigation between the camera using swipe gestures. 
 * Camera names shown using a single tap gesture. 
-* Reload of the camera image using double tap gesture. 
+* Reload of the camera image using double tap gesture.
+* Index page giving quick overview of all cameras.  
 
 ### Coming Soon
 
-* Index page giving quick overview of all cameras. 
 * Default camera - the application will open directly on the chosen default camera. 
 * Streaming mode for a camera switched on and off using a long click gesture. 
 * Switching on and off cameras from the list. 

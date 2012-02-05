@@ -25,21 +25,21 @@ import android.widget.ProgressBar;
 
 public class CameraPage extends FrameLayout {
 	
-	private int index;
+	private int mIndex;
 
 	public CameraPage(CameraActivity activity, int index) {
 		super(activity);
-		this.index = index;
+		this.mIndex = index;
 	}
 	
 	public void createContent() {
 		CameraActivity activity = (CameraActivity) getContext();
 		
 		// create the image view
-		ImageView imageView = new ImageView(activity);
-		imageView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.CENTER));
-		imageView.setVisibility(View.VISIBLE);
-		addView(imageView);
+		ImageView image = new ImageView(activity);
+		image.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, Gravity.CENTER));
+		image.setVisibility(View.VISIBLE);
+		addView(image);
 		
 		// create the progress bar
 		ProgressBar progress = new ProgressBar(activity, null, android.R.attr.progressBarStyleLarge);
@@ -48,18 +48,18 @@ public class CameraPage extends FrameLayout {
 		addView(progress);
 		        
         // check if there is a cached image
-        Bitmap cachedBitmap = CameraCache.getCachedBitmap(index);
+        Bitmap cachedBitmap = CameraCache.getCachedBitmap(mIndex);
         if (cachedBitmap != null) {
         	// cached image found - set it to the image view
-        	imageView.setImageBitmap(cachedBitmap);
+        	image.setImageBitmap(cachedBitmap);
         } else {
         	// load the image from network in a separate thread
-	        new DownloadImageTask(activity, index).execute();
+	        new DownloadImageTask(activity, mIndex).execute();
         }
 	}
 	
 	public int getIndex() {
-		return index;
+		return mIndex;
 	}
 	
 	public ImageView getImageView() {
