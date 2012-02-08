@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/thumbLayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <ImageView
+        android:id="@+id/thumbImage"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:src="@android:drawable/ic_menu_camera" android:scaleType="centerCrop"/>
+
+    <TextView
+        android:id="@+id/thumbText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Small Text"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:gravity="center"
+        android:layout_gravity="bottom"
+        android:background="#80000000"/>
+
+</FrameLayout>

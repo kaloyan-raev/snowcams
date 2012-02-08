@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -28,6 +29,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 public class IndexActivity extends Activity {
 
@@ -51,12 +53,12 @@ public class IndexActivity extends Activity {
 	
 	public class ImageAdapter extends BaseAdapter {
 		
-		// TODO ImageView cache
-		
 		private Context mContext;
+		private LayoutInflater mInflater;
 
 		public ImageAdapter(Context context) {
 			mContext = context;
+			mInflater = LayoutInflater.from(mContext);
 		}
 
 		@Override
@@ -76,22 +78,25 @@ public class IndexActivity extends Activity {
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			ImageView image;
-//	        if (convertView == null) {  // if it's not recycled, initialize some attributes
-	            int spacing = getResources().getDimensionPixelSize(R.dimen.index_spacing);
-	            int columnWidth = getResources().getDimensionPixelSize(R.dimen.index_column_width);
-	            // calculate number of columns in the grid
-	            int numColumns = parent.getWidth() / (columnWidth + spacing);
-	            // calculate the size of the image view so it best fits in the grid view
-	            int width = (numColumns == 0) ? 0 : (parent.getWidth() - numColumns * spacing) / numColumns;
-	            int height = width * 3 / 4;
-	            // create the image view
-	            image = new ImageView(mContext);
-	            image.setLayoutParams(new GridView.LayoutParams(width, height));
-	            image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-//	        } else {
-//	            image = (ImageView) convertView;
-//	        }
+			convertView = mInflater.inflate(R.layout.thumb, null);
+			ImageView image = (ImageView) convertView.findViewById(R.id.thumbImage);
+			TextView text = (TextView) convertView.findViewById(R.id.thumbText);
+			
+            int spacing = getResources().getDimensionPixelSize(R.dimen.index_spacing);
+            int columnWidth = getResources().getDimensionPixelSize(R.dimen.index_column_width);
+            // calculate number of columns in the grid
+            int numColumns = parent.getWidth() / (columnWidth + spacing);
+            // calculate the size of the thumbnail so it best fits in the grid view
+            int width = (numColumns == 0) ? 0 : (parent.getWidth() - numColumns * spacing) / numColumns;
+            int height = width * 3 / 4;
+            
+            // set the size of the thumbnail
+            convertView.setLayoutParams(new GridView.LayoutParams(width, height));
+            
+            // adjust the size of the camera label
+            text.setHeight(height / 3);
+            // set the camera label
+            text.setText(Camera.labelFor(position));
 
 	        // check if there is a cached image
 	        Bitmap cachedBitmap = CameraCache.getCachedBitmap(position);
@@ -104,7 +109,7 @@ public class IndexActivity extends Activity {
 		        new DownloadThumbnailTask(image, position).execute();
 	        }
 	        
-	        return image;
+	        return convertView;
 		}
 
 	}
