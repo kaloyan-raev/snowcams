@@ -46,4 +46,4 @@ Features
 License
 -------
 
-This is program is a free and open source software licensed under the [GNU General Public License](www.gnu.org/licenses/gpl-3.0.html) version 3.
+This program is a free and open source software licensed under the [GNU General Public License](www.gnu.org/licenses/gpl-3.0.html) version 3.
